@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+// Nosso agregado PixKey, consiste em: Se eu tenho uma PixKey, logo eu tenho uma Account, que tem um Bank.
+// PixKeyRepositoryInterface é a interface para injeção de dependencia no repository do nosso Agregado.
 type PixKeyRepositoryInterface interface {
 	RegisterKey(pixKey *PixKey) (*PixKey, error)
 	FindKeyByKind(key string, kind string) (*PixKey, error)
@@ -16,9 +18,11 @@ type PixKeyRepositoryInterface interface {
 }
 
 func init() {
+	// Vamos iniciar as validações assim que essa struct for iniciada.
 	govalidator.SetFieldsRequiredByDefault(true)
 }
 
+// Na Entidade PixKey, utilizamos tags para validação, json e para o ORM.
 type PixKey struct {
 	Base      `valid:"required"`
 	Kind      string   `json:"kind" gorm:"type:varchar(20)" valid:"notnull"`
@@ -29,8 +33,10 @@ type PixKey struct {
 }
 
 func (p *PixKey) isValid() error {
+	// Só queremos saber se é valido ou não.
 	_, err := govalidator.ValidateStruct(p)
 
+	// Validações simples, mas existem.
 	if p.Kind != "email" && p.Kind != "cpf" {
 		return errors.New("invalid type of key")
 	}
@@ -45,6 +51,7 @@ func (p *PixKey) isValid() error {
 	return nil
 }
 
+// NewPixKey, é o nossa função contrutora de um PixKey.
 func NewPixKey(kind string, account *Account, key string) (*PixKey, error) {
 	pixKey := PixKey{
 		Kind:      kind,

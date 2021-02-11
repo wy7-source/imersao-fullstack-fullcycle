@@ -7,13 +7,15 @@ import (
 	"time"
 )
 
+// Essas enumerações são os possiveis status da nossa transaction.
 const (
 	TransactionPending   string = "pending"
 	TransactionCompleted string = "completed"
 	TransactionError     string = "error"
 	TransactionConfirmed string = "confirmed"
 )
-
+// Nosso agregado Transaction, consiste em: Se eu tenho uma Transaction, logo eu tenho uma PixKey e uma Account, que tem um Bank.
+// TransactionRepositoryInterface é a interface para injeção de dependencia no repository do nosso Agregado.
 type TransactionRepositoryInterface interface {
 	Register(transaction *Transaction) error
 	Save(transaction *Transaction) error
@@ -24,6 +26,7 @@ type Transactions struct {
 	Transaction []Transaction
 }
 
+// Na Entidade Transaction, utilizamos tags para validação, json e para o ORM.
 type Transaction struct {
 	Base              `valid:"required"`
 	AccountFrom       *Account `valid:"-"`
@@ -37,20 +40,25 @@ type Transaction struct {
 }
 
 func init() {
+	// Vamos iniciar as validações assim que essa struct for iniciada.
 	govalidator.SetFieldsRequiredByDefault(true)
 }
 
 func (t *Transaction) isValid() error {
+	// Só queremos saber se é valido ou não.
 	_, err := govalidator.ValidateStruct(t)
 
+	// RN: Não pode transferir menos que 0.
 	if t.Amount <= 0 {
 		return errors.New("the amount must be greater than 0")
 	}
 
+	// RN: Status não pode ser diferente dos status possíveis.
 	if t.Status != TransactionPending && t.Status != TransactionCompleted && t.Status != TransactionError {
 		return errors.New("invalid status for the transaction")
 	}
 
+	// RN: Não pode transferir para sí mesmo.
 	if t.PixKeyTo.AccountID == t.AccountFromID {
 		return errors.New("the source and destination account cannot be the same")
 	}
@@ -61,6 +69,8 @@ func (t *Transaction) isValid() error {
 	return nil
 }
 
+// Abaixo, seguindo a linguagem universal do negócio, são as unicas operações que essa entidade faz.
+// Complete é a operação que completa a Transaction.
 func (t *Transaction) Complete() error {
 	t.Status = TransactionCompleted
 	t.UpdatedAt = time.Now()
@@ -68,6 +78,9 @@ func (t *Transaction) Complete() error {
 	return err
 }
 
+// INFO: Há a possibilidade de ter uma operação de Confirmação da Transação, mas seria basicamente uma cópia da Complete(). Então optamos por deixar isso no proprio usecase.
+
+// Cancel é a operação que cancela a Transaction.
 func (t *Transaction) Cancel(description string) error {
 	t.Status = TransactionError
 	t.CancelDescription = description
@@ -76,6 +89,7 @@ func (t *Transaction) Cancel(description string) error {
 	return err
 }
 
+// NewTransaction, é o nossa função contrutora de um PixKey.
 func NewTransaction(accountFrom *Account, amount float64, pixKeyTo *PixKey, description string, id string) (*Transaction, error) {
 	transaction := Transaction{
 		AccountFrom:   accountFrom,
@@ -83,7 +97,7 @@ func NewTransaction(accountFrom *Account, amount float64, pixKeyTo *PixKey, desc
 		Amount:        amount,
 		PixKeyTo:      pixKeyTo,
 		PixKeyIdTo:    pixKeyTo.ID,
-		Status:        TransactionPending,
+		Status:        TransactionPending, // Uma transação sempre inicia com status Pending.
 		Description:   description,
 	}
 	if id == "" {
