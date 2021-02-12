@@ -5,12 +5,12 @@ import (
 	"github.com/codeedu/imersao/codepix-go/domain/model"
 	"log"
 )
-
+// Injetamos quem já implementa as interfaces.
 type TransactionUseCase struct {
 	TransactionRepository model.TransactionRepositoryInterface
 	PixRepository         model.PixKeyRepositoryInterface
 }
-
+// Register() é o método que cria uma nova Transaction.
 func (t *TransactionUseCase) Register(accountId string, amount float64, pixKeyto string, pixKeyKindTo string, description string, id string) (*model.Transaction, error) {
 
 	account, err := t.PixRepository.FindAccount(accountId)
@@ -36,7 +36,7 @@ func (t *TransactionUseCase) Register(accountId string, amount float64, pixKeyto
 	return nil, errors.New("unable to process this transaction")
 
 }
-
+// Confirm() é o método que troca o Status da Transaction de "Pending" para "Confirmed".
 func (t *TransactionUseCase) Confirm(transactionId string) (*model.Transaction, error) {
 	transaction, err := t.TransactionRepository.Find(transactionId)
 	if err != nil {
@@ -52,7 +52,7 @@ func (t *TransactionUseCase) Confirm(transactionId string) (*model.Transaction, 
 
 	return transaction, nil
 }
-
+// Complete() é o método que troca o Status da Transaction de "Confirmed" para "Completed".
 func (t *TransactionUseCase) Complete(transactionId string) (*model.Transaction, error) {
 	transaction, err := t.TransactionRepository.Find(transactionId)
 	if err != nil {
@@ -68,7 +68,7 @@ func (t *TransactionUseCase) Complete(transactionId string) (*model.Transaction,
 
 	return transaction, nil
 }
-
+// Error() é o método que troca o Status da Transaction para "Error".
 func (t *TransactionUseCase) Error(transactionId string, reason string) (*model.Transaction, error) {
 	transaction, err := t.TransactionRepository.Find(transactionId)
 	if err != nil {

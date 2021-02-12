@@ -11,16 +11,17 @@ import (
 	"log"
 	"net"
 )
-
+// StartGrpcServer() configura e Starta o nosso server gRPC.
 func StartGrpcServer(database *gorm.DB, port int) {
 	grpcServer := grpc.NewServer()
-	reflection.Register(grpcServer)
+	reflection.Register(grpcServer) // Para conseguirmos debugar com um client gRPC.
 
 	pixRepository := repository.PixKeyRepositoryDb{Db: database}
 	pixUseCase := usecase.PixUseCase{PixKeyRepository: pixRepository}
 	pixGrpcService := NewPixGrpcService(pixUseCase)
 	pb.RegisterPixServiceServer(grpcServer, pixGrpcService)
 
+	// Criamos um Listener Padrão para plugar no server.
 	address := fmt.Sprintf("0.0.0.0:%d", port)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {

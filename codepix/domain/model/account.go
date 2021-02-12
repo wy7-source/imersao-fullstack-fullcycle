@@ -17,7 +17,7 @@ type Account struct {
 	Base      `valid:"required"`
 	OwnerName string    `gorm:"column:owner_name;type:varchar(255);not null" valid:"notnull"`
 	Bank      *Bank     `valid:"-"`
-	BankID    string    `gorm:"column:bank_id;type:uuid;not null" valid:"-"`
+	BankID    string    `gorm:"column:bank_id;type:uuid;not null" valid:"-"` // O ORM precisa dessa propriedade para relacionar o Bank(FK) com a Account.
 	Number    string    `json:"number" gorm:"type:varchar(20)" valid:"notnull"`
 	PixKeys   []*PixKey `gorm:"ForeignKey:AccountID" valid:"-"` // Na minha conta, posso ter várias PixKey's... A tag gorm está relacionando o nosso ID da Account a cada PixKey, mas não valida notnull.
 }

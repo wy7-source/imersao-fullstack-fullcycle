@@ -5,12 +5,12 @@ import (
 	"github.com/codeedu/imersao/codepix-go/application/grpc/pb"
 	"github.com/codeedu/imersao/codepix-go/application/usecase"
 )
-
+// PixGrpcService implementa a nossa interface PixServiceClient do gRPC.
 type PixGrpcService struct {
 	PixUseCase usecase.PixUseCase
 	pb.UnimplementedPixServiceServer
 }
-
+// RegisterPixKey() é o método que implementa o serviço de Registrar uma PixKey.
 func (p *PixGrpcService) RegisterPixKey(ctx context.Context, in *pb.PixKeyRegistration) (*pb.PixKeyCreatedResult, error) {
 	key, err := p.PixUseCase.RegisterKey(in.Key, in.Kind, in.AccountId)
 	if err != nil {
@@ -25,7 +25,7 @@ func (p *PixGrpcService) RegisterPixKey(ctx context.Context, in *pb.PixKeyRegist
 		Status: "created",
 	}, nil
 }
-
+// Find() é o método que implementa o serviço de Encontrar uma PixKey pelo seu ID.
 func (p *PixGrpcService) Find(ctx context.Context, in *pb.PixKey) (*pb.PixKeyInfo, error) {
 	pixKey, err := p.PixUseCase.FindKey(in.Key, in.Kind)
 	if err != nil {
@@ -47,7 +47,7 @@ func (p *PixGrpcService) Find(ctx context.Context, in *pb.PixKey) (*pb.PixKeyInf
 		CreatedAt: pixKey.CreatedAt.String(),
 	}, nil
 }
-
+// NewPixGrpcService é o nosso construtor.
 func NewPixGrpcService(usecase usecase.PixUseCase) *PixGrpcService {
 	return &PixGrpcService{
 		PixUseCase: usecase,

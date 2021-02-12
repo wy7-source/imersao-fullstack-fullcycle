@@ -17,6 +17,7 @@ func init() {
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
 
+	//Usaremos um arquivo .env para as conexões de DB.
 	err := godotenv.Load(basepath + "/../../.env")
 
 	if err != nil {
@@ -24,6 +25,7 @@ func init() {
 	}
 }
 
+// ConnectDB configura as nossas conexões de DB mais baixo nível.
 func ConnectDB(env string) *gorm.DB {
 	var dsn string
 	var db *gorm.DB
@@ -47,6 +49,7 @@ func ConnectDB(env string) *gorm.DB {
 	}
 
 	if os.Getenv("AutoMigrateDb") == "true" {
+		// Para criarmos as migrações automaticamente.
 		db.AutoMigrate(&model.Bank{}, &model.Account{}, &model.PixKey{}, &model.Transaction{})
 	}
 
