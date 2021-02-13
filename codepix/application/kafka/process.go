@@ -10,13 +10,13 @@ import (
 	"github.com/jinzhu/gorm"
 	"os"
 )
-
+// KafkaProcessor representa um serviço de Consumo dos Topics do Kafka.
 type KafkaProcessor struct {
 	Database     *gorm.DB
 	Producer     *ckafka.Producer
 	DeliveryChan chan ckafka.Event
 }
-
+// NewKafkaProcessor é o construtor.
 func NewKafkaProcessor(database *gorm.DB, producer *ckafka.Producer, deliveryChan chan ckafka.Event) *KafkaProcessor {
 	return &KafkaProcessor{
 		Database:     database,
@@ -24,7 +24,7 @@ func NewKafkaProcessor(database *gorm.DB, producer *ckafka.Producer, deliveryCha
 		DeliveryChan: deliveryChan,
 	}
 }
-
+// Consume é o método que configura o kafa.Consumer, e consome as mensagens.
 func (k *KafkaProcessor) Consume() {
 	configMap := &ckafka.ConfigMap{
 		"bootstrap.servers": os.Getenv("kafkaBootstrapServers"),
@@ -41,6 +41,7 @@ func (k *KafkaProcessor) Consume() {
 	c.SubscribeTopics(topics, nil)
 
 	fmt.Println("kafka consumer has been started")
+	// Um loop para ler as mensagens.
 	for {
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
@@ -49,7 +50,7 @@ func (k *KafkaProcessor) Consume() {
 		}
 	}
 }
-
+// processMessage é o método que processa as mensagens vindas pelo topic principal.
 func (k *KafkaProcessor) processMessage(msg *ckafka.Message) {
 	transactionsTopic := "transactions"
 	transactionConfirmationTopic := "transaction_confirmation"
@@ -63,7 +64,7 @@ func (k *KafkaProcessor) processMessage(msg *ckafka.Message) {
 		fmt.Println("not a valid topic", string(msg.Value))
 	}
 }
-
+// processTransaction é o método que publica uma 'TransactionPending', pelo topic do Bank de destino.
 func (k *KafkaProcessor) processTransaction(msg *ckafka.Message) error {
 	transaction := appmodel.NewTransaction()
 	err := transaction.ParseJson(msg.Value)
@@ -101,7 +102,7 @@ func (k *KafkaProcessor) processTransaction(msg *ckafka.Message) error {
 	}
 	return nil
 }
-
+// processTransactionConfirmation é o método que processa tanto 'TransactionConfirmed's vindas dos Bank's de destino, como 'TransactionCompleted' dos Bank's de origem.
 func (k *KafkaProcessor) processTransactionConfirmation(msg *ckafka.Message) error {
 	transaction := appmodel.NewTransaction()
 	err := transaction.ParseJson(msg.Value)
@@ -125,7 +126,7 @@ func (k *KafkaProcessor) processTransactionConfirmation(msg *ckafka.Message) err
 	}
 	return nil
 }
-
+// confirmTransaction é o método que muda o status para 'TransactionConfirmed' e publica pelo topic do Bank de origem. 
 func (k *KafkaProcessor) confirmTransaction(transaction *appmodel.Transaction, transactionUseCase usecase.TransactionUseCase) error {
 	confirmedTransaction, err := transactionUseCase.Confirm(transaction.ID)
 	if err != nil {

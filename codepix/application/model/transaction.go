@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 )
-
+// Transaction é uma Dto para parse de dados vindos do Kafka.
 type Transaction struct {
 	ID           string  `json:"id" validate:"required,uuid4"`
 	AccountID    string  `json:"accountId" validate:"required,uuid4"`
@@ -16,7 +16,7 @@ type Transaction struct {
 	Status       string  `json:"status" validate:"-"`
 	Error        string  `json:"error"`
 }
-
+// isValid é o método para validar manualmente a Dto.
 func (t *Transaction) isValid() error {
 	v := validator.New()
 	err := v.Struct(t)
@@ -26,7 +26,7 @@ func (t *Transaction) isValid() error {
 	}
 	return nil
 }
-
+// ParseJson é o método para deserealizar do Kafka para a nossa Dto.
 func (t *Transaction) ParseJson(data []byte) error {
 	err := json.Unmarshal(data, t)
 	if err != nil {
@@ -40,7 +40,7 @@ func (t *Transaction) ParseJson(data []byte) error {
 
 	return nil
 }
-
+// ToJson é o método para serealizar a nossa Dto para enviar pelo Kafka.
 func (t *Transaction) ToJson() ([]byte, error) {
 	err := t.isValid()
 	if err != nil {
@@ -54,7 +54,7 @@ func (t *Transaction) ToJson() ([]byte, error) {
 
 	return result, nil
 }
-
+// NewTransaction é o construtor da Dto.
 func NewTransaction() *Transaction {
 	return &Transaction{}
 }

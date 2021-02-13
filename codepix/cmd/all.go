@@ -47,7 +47,7 @@ var allCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(allCmd)
-	allCmd.Flags().IntVarP(&gRPCPortNumber, "grpc-port","p", 500051,"gRPC Port")
+	allCmd.Flags().IntVarP(&gRPCPortNumber, "grpc-port","p", 50051,"gRPC Port")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
