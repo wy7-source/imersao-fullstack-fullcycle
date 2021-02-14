@@ -7,12 +7,12 @@ export class CreateTransactionsTable1612394636514 implements MigrationInterface 
           new Table({
             name: 'transactions',
             columns: [
-              {
+              {// Um UUID nosso.
                 name: 'id',
                 type: 'uuid',
                 isPrimary: true,
               },
-              {
+              {// Um UUID que vem do CodePix.
                 name: 'external_id',
                 type: 'uuid',
               },
@@ -25,11 +25,11 @@ export class CreateTransactionsTable1612394636514 implements MigrationInterface 
                 type: 'varchar',
                 isNullable: true
               },
-              {
+              { // Destino
                 name: 'bank_account_id',
                 type: 'uuid',
               },
-              {
+              { // Origem
                 name: 'bank_account_from_id',
                 type: 'uuid',
                 isNullable: true

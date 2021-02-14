@@ -2,7 +2,7 @@ import {BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} 
 import {v4 as uuidv4} from 'uuid';
 
 @Entity({
-    name: 'bank_accounts'
+    name: 'bank_accounts' // Nome da tabela, para o TypeOrm não procurar pelo nome da entidade.
 })
 export class BankAccount {
     @PrimaryGeneratedColumn('uuid')
@@ -17,7 +17,7 @@ export class BankAccount {
     @Column()
     balance: number;
 
-    @CreateDateColumn({type: 'timestamp'})
+    @CreateDateColumn({type: 'timestamp'}) // Decorator para especificar que essa é uma data criada automaticamente.
     created_at: Date;
 
     @BeforeInsert()

@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 @Controller('bank-accounts')
 export class BankAccountController {
   constructor(
-    @InjectRepository(BankAccount)
+    @InjectRepository(BankAccount) // Injetamos automagicamente o nosso repository com o nest. 
     private bankAccountRepo: Repository<BankAccount>,
   ) {}
 

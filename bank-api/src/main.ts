@@ -5,9 +5,9 @@ import { ModelNotFoundExceptionFilter } from './exception-filters/model-not-foun
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {cors: true});
-  app.setGlobalPrefix('api');
-  app.useGlobalFilters(new ModelNotFoundExceptionFilter());
-  app.connectMicroservice({
+  app.setGlobalPrefix('api'); // um prefixo global para todas as rotas
+  app.useGlobalFilters(new ModelNotFoundExceptionFilter()); // Para os nossos exception filters.
+  app.connectMicroservice({ //Configurações de consumer para se comunicar com o Kafka.
     transport: Transport.KAFKA,
     options: {
       client: {

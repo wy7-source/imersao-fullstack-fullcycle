@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { Response } from 'express';
 
+// Essa Classe filtra a EntityNotFound, para que não seja retornado erro 500...
 @Catch(EntityNotFoundError)
 export class ModelNotFoundExceptionFilter implements ExceptionFilter {
   catch(exception: EntityNotFoundError, host: ArgumentsHost) {

@@ -23,7 +23,7 @@ import {
 } from 'src/models/transaction.model';
 import { Repository } from 'typeorm';
 
-@Controller('bank-accounts/:bankAccountId/transactions')
+@Controller('bank-accounts/:bankAccountId/transactions')// Estaremos sempre dependendo do parametro bankAccountId, pois temos Rotas Alinhadas.
 export class TransactionController implements OnModuleInit, OnModuleDestroy {
   private kafkaProducer: Producer;
   constructor(
@@ -70,7 +70,7 @@ export class TransactionController implements OnModuleInit, OnModuleDestroy {
       new ParseUUIDPipe({ version: '4', errorHttpStatusCode: 422 }),
     )
     bankAccountId: string,
-    @Body(new ValidationPipe({ errorHttpStatusCode: 422 }))
+    @Body(new ValidationPipe({ errorHttpStatusCode: 422 })) // O ValidationPipe são as validações de dentro da Dto.
     body: TransactionDto,
   ) {
     await this.bankAccountRepo.findOneOrFail(bankAccountId);
@@ -100,7 +100,7 @@ export class TransactionController implements OnModuleInit, OnModuleDestroy {
     return transaction;
   }
 
-  @MessagePattern(`bank${process.env.BANK_CODE}`)
+  @MessagePattern(`bank${process.env.BANK_CODE}`) // Para ouvirmos o tópico do Bank.
   async doTransaction(@Payload() message) {
     if (message.value.status === 'pending') {
       await this.receivedTransaction(message.value);

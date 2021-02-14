@@ -1,5 +1,6 @@
 import { Observable } from "rxjs";
 
+// Somente para nos ajudar com a tipagem do PixService(GRPC).
 interface Account {
   accountId: string;
   accountNumber: string;

@@ -43,6 +43,7 @@ export class Transaction {
   @Column()
   bank_account_id: string;
 
+  // Para criarmos também um relacionamento de quando se trata de uma transaferência entre contas no mesmo Bank.
   @ManyToOne(() => BankAccount)
   @JoinColumn({name: "bank_account_from_id"})
   bankAccountFrom: BankAccount;

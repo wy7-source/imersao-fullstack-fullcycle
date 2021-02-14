@@ -22,16 +22,18 @@ import { BankAccount } from 'src/models/bank-account.model';
 import { PixKey } from 'src/models/pix-key.model';
 import { Repository } from 'typeorm';
 
-@Controller('bank-accounts/:bankAccountId/pix-keys')
+@Controller('bank-accounts/:bankAccountId/pix-keys') // Estaremos sempre dependendo do parametro bankAccountId, pois temos Rotas Alinhadas.
 export class PixKeyController {
   constructor(
+    // Injetamos automagicamente os nossos repository's com o nest. 
     @InjectRepository(PixKey)
     private pixKeyRepo: Repository<PixKey>,
     @InjectRepository(BankAccount)
     private bankAccountRepo: Repository<BankAccount>,
-    @Inject('CODEPIX_PACKAGE')
+    @Inject('CODEPIX_PACKAGE') // Para Injetarmos o nosso módulo com o GRPC Configurado na AppModule.
     private client: ClientGrpc,
   ) {}
+  
   @Get()
   index(
     @Param('bankAccountId', new ParseUUIDPipe({ version: '4' }))
@@ -51,7 +53,7 @@ export class PixKeyController {
   async store(
     @Param('bankAccountId', new ParseUUIDPipe({ version: '4' }))
     bankAccountId: string,
-    @Body(new ValidationPipe({ errorHttpStatusCode: 422 }))
+    @Body(new ValidationPipe({ errorHttpStatusCode: 422 })) // O ValidationPipe são as validações de dentro da Dto.
     body: PixKeyDto,
   ) {
     await this.bankAccountRepo.findOneOrFail(bankAccountId);
@@ -82,6 +84,7 @@ export class PixKeyController {
   }
 
   async checkPixKeyNotFound(params: { key: string; kind: string }) {
+    // Para checarmos se a PixKey já existe no lado do CodePix.
     const pixService: PixService = this.client.getService('PixService');
     try {
       await pixService.find(params).toPromise();
@@ -90,7 +93,7 @@ export class PixKeyController {
       if (e.details === 'no key was found') {
         return true;
       }
-
+      // caso o erro seja diferente de uma PixKeyNotFound...
       throw new InternalServerErrorException('Server not available');
     }
   }

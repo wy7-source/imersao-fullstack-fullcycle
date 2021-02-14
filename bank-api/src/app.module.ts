@@ -18,30 +18,35 @@ import { TransactionSubscriber } from './subscribers/transaction-subscriber/tran
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    ConsoleModule,
-    TypeOrmModule.forRoot({
+    // forRoot, importa todos os artefatos do módulo para o AppModule raiz em específico.
+    ConfigModule.forRoot(), //Módulo para leitura de variáveis de ambiente.
+    ConsoleModule, // Nosso módulo para habilitar comandos de console.
+    TypeOrmModule.forRoot({ 
+      // As variáveis de ambiente que foram lidas pelo ConfigModule.
       type: process.env.TYPEORM_CONNECTION as any,
       host: process.env.TYPEORM_HOST,
       port: parseInt(process.env.TYPEORM_PORT),
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      entities: [BankAccount, PixKey, Transaction]
+      entities: [BankAccount, PixKey, Transaction] // Entidades disponíveis.
     }),
-    TypeOrmModule.forFeature([BankAccount, PixKey, Transaction]),
+    // forFeatura, importa para uso na aplicação.
+    TypeOrmModule.forFeature([BankAccount, PixKey, Transaction]), // Entidades Habilitadas para uso na aplicação.
+    //Configurações para se comunicar com o CodePix por GRPC.
     ClientsModule.register([
       {
         name: 'CODEPIX_PACKAGE',
         transport: Transport.GRPC,
         options: {
           url: process.env.GRPC_URL,
-          package: 'github.com.codeedu.codepix',
-          protoPath: [join(__dirname, 'protofiles/pixkey.proto')]
+          package: 'github.com.codeedu.codepix', // O mesmo nome de pacote que temos no protofile do CodePix.
+          protoPath: [join(__dirname, 'protofiles/pixkey.proto')] // Para importar os ProtoFiles.
         }
       }
     ]),
     ClientsModule.register([
+      //Configurações de producer para se comunicar com o Kafka.
       {
         name: 'TRANSACTION_SERVICE',
         transport: Transport.KAFKA,

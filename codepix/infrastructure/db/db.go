@@ -26,6 +26,7 @@ func init() {
 }
 
 // ConnectDB configura as nossas conexões de DB mais baixo nível.
+// Essa, é o tipo de implementação que não há problema de depender, pois o proprio driver do postgree ou sqlite3 usado no ORM, implementa as interfaces do ORM.
 func ConnectDB(env string) *gorm.DB {
 	var dsn string
 	var db *gorm.DB
